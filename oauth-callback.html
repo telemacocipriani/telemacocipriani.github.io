@@ -48,6 +48,7 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
+    const state = params.get("state");
     const error = params.get("error");
     const el = document.getElementById("content");
 
@@ -60,6 +61,7 @@
         <code id="code">${code}</code>
         <button onclick="navigator.clipboard.writeText(document.getElementById('code').textContent)">Copy</button>
         <p class="muted">This code is single-use and short-lived — it's only useful paired with the app's client secret, which never appears on this page.</p>
+        ${state ? `<p class="muted">state (sanity-check it matches what the script printed): <code style="display:inline;padding:0.15rem 0.4rem;">${state}</code></p>` : ""}
       `;
     } else {
       el.innerHTML = `<p class="error">No authorization code found in the URL.</p>`;
