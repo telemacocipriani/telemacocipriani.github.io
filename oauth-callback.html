@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telemaco — Authorization</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    max-width: 640px;
+    margin: 4rem auto;
+    padding: 0 1.5rem;
+    line-height: 1.6;
+    color: #1a1a1a;
+  }
+  @media (prefers-color-scheme: dark) {
+    body { color: #e8e8e8; background: #121212; }
+  }
+  h1 { font-size: 1.5rem; }
+  code {
+    display: block;
+    word-break: break-all;
+    background: #f0f0f0;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin: 1rem 0;
+  }
+  @media (prefers-color-scheme: dark) { code { background: #222; } }
+  button {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #888;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+  .muted { color: #888; font-size: 0.9rem; }
+  .error { color: #c0392b; }
+</style>
+</head>
+<body>
+  <h1>Authorization complete</h1>
+  <div id="content"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const error = params.get("error");
+    const el = document.getElementById("content");
+
+    if (error) {
+      el.innerHTML = `<p class="error">Authorization failed: ${error}</p>
+        <p class="muted">${params.get("error_description") || ""}</p>`;
+    } else if (code) {
+      el.innerHTML = `
+        <p>Copy this code and paste it back into the setup script running on Telemaco:</p>
+        <code id="code">${code}</code>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('code').textContent)">Copy</button>
+        <p class="muted">This code is single-use and short-lived — it's only useful paired with the app's client secret, which never appears on this page.</p>
+      `;
+    } else {
+      el.innerHTML = `<p class="error">No authorization code found in the URL.</p>`;
+    }
+  </script>
+</body>
+</html>
