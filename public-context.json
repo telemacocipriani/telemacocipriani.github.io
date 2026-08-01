@@ -1,15 +1,25 @@
 {
   "_meta": {
     "purpose": "PUBLIC CONTEXT — the single source of truth for what the website is allowed to say about Telemaco and Andrea. Anything not here is private and must never be exposed by the site chat. This file is served as-is over HTTP; treat every field as world-readable. Do NOT add phone numbers, addresses, family details, health data, account identifiers, secrets, or anything from ~/context that isn't already public.",
-    "version": 1,
+    "version": 2,
     "updated": "2026-08-01"
   },
 
   "persona": {
     "name": "Telemaco",
     "role": "Andrea Cipriani's personal AI assistant",
-    "greeting": "Hi — I'm Telemaco, Andrea's AI assistant. Ask me what I do, or leave a message and I'll pass it straight to him. I'm a bot, and I only share what's public.",
+    "greeting": "Hi — I'm Telemaco, Andrea's AI assistant. Ask me about him — what he does, where he is, what he's into — or leave a message and I'll pass it straight to him. I'm a bot, and I only share what's public.",
     "handoff_note": "For anything I can't answer from public info, I'll hand you off to the real me — I screen messages and relay the genuine ones to Andrea."
+  },
+
+  "profile": {
+    "_note": "Public, safe-to-share facts about Andrea. Keep it light and non-sensitive. 'location.current' is maintained by Telemaco and updated when Andrea travels.",
+    "job": { "title": "Software Engineer", "company": "Airbnb" },
+    "location": { "current": "New York City", "based": "New York City" },
+    "favorites": {
+      "movies": [],
+      "books": []
+    }
   },
 
   "contact": {
@@ -19,11 +29,11 @@
   },
 
   "suggested_prompts": [
-    "Who are you?",
-    "What can you do?",
-    "How do I reach Andrea?",
-    "Are you a real person?",
-    "What data do you have on me?"
+    "What does Andrea do?",
+    "Where is Andrea right now?",
+    "Favorite movies?",
+    "Favorite books?",
+    "How do I reach Andrea?"
   ],
 
   "faq": [
@@ -35,9 +45,37 @@
     },
     {
       "id": "who-is-andrea",
-      "keywords": ["who is andrea", "about andrea", "andrea cipriani"],
-      "answer": "Andrea Cipriani is the person I work for — I'm his private assistant, not a replacement for him. I can pass a message to him, but I keep his personal details private.",
-      "chips": ["How do I reach Andrea?", "What can you do?"]
+      "keywords": ["who is andrea", "about andrea", "andrea cipriani", "tell me about him"],
+      "answer": "Andrea Cipriani is the person I work for — a {{profile.job.title}} at {{profile.job.company}}, based in {{profile.location.based}}. I'm his private assistant, not a replacement for him: I can share public bits and pass a message to him, but his personal details stay private.",
+      "chips": ["What does Andrea do?", "Favorite movies?", "How do I reach Andrea?"]
+    },
+    {
+      "id": "job",
+      "keywords": ["what does andrea do", "job", "work", "profession", "career", "airbnb", "engineer", "for a living", "company", "employer"],
+      "answer": "Andrea is a {{profile.job.title}} at {{profile.job.company}}.",
+      "chips": ["Where is Andrea right now?", "Favorite books?", "How do I reach Andrea?"]
+    },
+    {
+      "id": "location",
+      "keywords": ["where is andrea", "where are you", "location", "right now", "based", "live", "city", "country", "where"],
+      "answer": "Right now Andrea is in {{profile.location.current}}.",
+      "chips": ["What does Andrea do?", "Favorite movies?", "How do I reach Andrea?"]
+    },
+    {
+      "id": "movies",
+      "keywords": ["favorite movie", "favourite movie", "movies", "films", "film", "watch", "cinema"],
+      "answer": "A few of Andrea's favorite films:",
+      "from": "profile.favorites.movies",
+      "empty": "Andrea hasn't shared a public list of favorite films yet — want me to ask him?",
+      "chips": ["Favorite books?", "What does Andrea do?", "How do I reach Andrea?"]
+    },
+    {
+      "id": "books",
+      "keywords": ["favorite book", "favourite book", "books", "reading", "read", "author"],
+      "answer": "A few of Andrea's favorite books:",
+      "from": "profile.favorites.books",
+      "empty": "Andrea hasn't shared a public list of favorite books yet — want me to ask him?",
+      "chips": ["Favorite movies?", "Where is Andrea right now?", "How do I reach Andrea?"]
     },
     {
       "id": "capabilities",

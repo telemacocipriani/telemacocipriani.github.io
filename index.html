@@ -277,6 +277,15 @@
 
   function esc(s){return s.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
 
+  // resolve "a.b.c" against the loaded context
+  function get(path){
+    return path.split('.').reduce(function(o,k){ return (o==null)?null:o[k]; }, ctx);
+  }
+  // fill {{a.b.c}} tokens from context, then escape
+  function fill(s){
+    return esc(String(s).replace(/\{\{([\w.]+)\}\}/g, function(_,p){ var v=get(p); return v==null?'':v; }));
+  }
+
   function bubble(text, who, html){
     var d=document.createElement('div');
     d.className='msg '+(who||'bot');
@@ -319,9 +328,19 @@
     var t=typing();
     setTimeout(function(){
       t.remove();
-      var html=esc(entry.answer);
+      var list = entry.from ? get(entry.from) : null;
+      var handoff = entry.handoff, html;
+      if(entry.from && (!list || !list.length)){
+        // list-backed answer with nothing to show yet → graceful, offer handoff
+        html = esc(entry.empty || "Andrea hasn't shared that publicly yet.");
+        handoff = true;
+      } else if(entry.from){
+        html = fill(entry.answer) + '<br>• ' + list.map(esc).join('<br>• ');
+      } else {
+        html = fill(entry.answer);
+      }
       if(entry.link){ html+=' <a href="'+entry.link.href+'">'+esc(entry.link.label)+'</a>'; }
-      if(entry.handoff){
+      if(handoff){
         html+=' <a href="'+mailtoFor(userText)+'">Leave a message for Andrea →</a>';
       }
       bubble(html,'bot',true);
