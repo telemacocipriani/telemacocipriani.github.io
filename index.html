@@ -106,6 +106,37 @@
   footer .logo{width:18px; height:18px; vertical-align:-4px; margin-right:6px}
   footer a{color:var(--muted)} footer a:hover{color:var(--ink)}
 
+  /* chat contact */
+  .chat{max-width:620px; margin:0 auto; border:1px solid var(--panel-brd); border-radius:22px;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02)); overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.45); text-align:left}
+  .chat .head{display:flex; align-items:center; gap:11px; padding:15px 18px; border-bottom:1px solid var(--panel-brd)}
+  .chat .head .av{width:34px; height:34px; flex:0 0 auto}
+  .chat .head .who{font-weight:600; font-size:.98rem; line-height:1.1}
+  .chat .head .st{font-size:.76rem; color:var(--muted); display:flex; align-items:center; gap:6px; margin-top:2px}
+  .chat .head .st .dot{width:7px; height:7px; border-radius:50%; background:#28c840; box-shadow:0 0 10px #28c840}
+  .log{padding:18px; display:flex; flex-direction:column; gap:12px; height:340px; overflow-y:auto; scroll-behavior:smooth}
+  .msg{max-width:82%; padding:11px 14px; border-radius:14px; font-size:.94rem; line-height:1.5; white-space:pre-wrap; word-wrap:break-word}
+  .msg.bot{align-self:flex-start; background:rgba(255,255,255,.06); border:1px solid var(--panel-brd); border-bottom-left-radius:4px}
+  .msg.me{align-self:flex-end; background:linear-gradient(120deg,var(--a1),var(--a2)); color:#05070d; border-bottom-right-radius:4px; font-weight:500}
+  .msg a{color:var(--a1); text-decoration:underline}
+  .msg.me a{color:#05070d}
+  .typing{align-self:flex-start; display:flex; gap:5px; padding:13px 14px; background:rgba(255,255,255,.06); border:1px solid var(--panel-brd); border-radius:14px; border-bottom-left-radius:4px}
+  .typing i{width:7px; height:7px; border-radius:50%; background:var(--muted); animation:bob 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.18s} .typing i:nth-child(3){animation-delay:.36s}
+  @keyframes bob{0%,60%,100%{opacity:.3; transform:translateY(0)}30%{opacity:1; transform:translateY(-4px)}}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; padding:0 18px 12px}
+  .chip{cursor:pointer; font:inherit; font-size:.84rem; color:var(--a1); background:rgba(34,211,238,.08);
+    border:1px solid rgba(34,211,238,.28); border-radius:999px; padding:7px 13px; transition:.15s}
+  .chip:hover{background:rgba(34,211,238,.16); transform:translateY(-1px)}
+  .compose{display:flex; gap:10px; padding:14px 16px; border-top:1px solid var(--panel-brd)}
+  .compose input{flex:1; background:rgba(0,0,0,.25); border:1px solid var(--panel-brd); border-radius:12px;
+    color:var(--ink); font:inherit; font-size:.94rem; padding:12px 14px; outline:none}
+  .compose input:focus{border-color:var(--a1)}
+  .compose button{flex:0 0 auto; cursor:pointer; border:none; border-radius:12px; padding:0 18px; font:inherit; font-weight:600;
+    color:#05070d; background:linear-gradient(120deg,var(--a1),var(--a2))}
+  .compose button:hover{filter:brightness(1.08)}
+
   @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
 </style>
 </head>
@@ -184,16 +215,27 @@
   </section>
 
   <section class="section" id="contact">
-    <div class="contact">
-      <h2>Get in touch</h2>
-      <p>
-        Want to reach Andrea? Send me a note and I'll pass it along. I screen incoming
-        messages and forward the real ones straight to him — so you get to a human, not a void.
-      </p>
-      <div class="cta">
-        <a class="btn primary" href="mailto:telemacocipriani@gmail.com?subject=%5BTelemaco%20Website%5D%20Message%20for%20Andrea&amp;body=Hi%20Telemaco%2C%0A%0A(Booking%20a%20time%20with%20Andrea%2C%20or%20a%20question%20for%20him%20%E2%80%94%20either%20works.)%0A%0AName%3A%0AMessage%3A%0A">Email Telemaco</a>
+    <h2>Talk to me</h2>
+    <p class="sub">Ask what I do, or leave a message for Andrea. I answer from public info only — anything else, I relay to him.</p>
+    <div class="chat" id="chat">
+      <div class="head">
+        <svg class="av" aria-hidden="true"><use href="#tlogo"/></svg>
+        <div>
+          <div class="who">Telemaco</div>
+          <div class="st"><span class="dot"></span> online · Andrea's AI assistant</div>
+        </div>
       </div>
+      <div class="log" id="log" role="log" aria-live="polite"></div>
+      <div class="chips" id="chips"></div>
+      <form class="compose" id="compose" autocomplete="off">
+        <input id="input" type="text" placeholder="Ask me something…" aria-label="Message Telemaco">
+        <button type="submit">Send</button>
+      </form>
     </div>
+    <noscript>
+      <p class="sub" style="margin-top:20px">The chat needs JavaScript. You can also
+        <a href="mailto:telemacocipriani@gmail.com?subject=%5BTelemaco%20Website%5D%20Message%20for%20Andrea">email Telemaco directly</a>.</p>
+    </noscript>
   </section>
 </div>
 
@@ -224,6 +266,103 @@
     el.textContent=full.slice(0,ci);
     setTimeout(tick, del?26:50);
   })();
+})();
+
+// ---- Public-context chat ----
+(function(){
+  var log=document.getElementById('log'), chipBox=document.getElementById('chips'),
+      form=document.getElementById('compose'), input=document.getElementById('input');
+  if(!log||!form) return;
+  var ctx=null, booted=false;
+
+  function esc(s){return s.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+
+  function bubble(text, who, html){
+    var d=document.createElement('div');
+    d.className='msg '+(who||'bot');
+    d.innerHTML = html ? text : esc(text);
+    log.appendChild(d); log.scrollTop=log.scrollHeight;
+    return d;
+  }
+  function typing(){
+    var d=document.createElement('div'); d.className='typing';
+    d.innerHTML='<i></i><i></i><i></i>'; log.appendChild(d); log.scrollTop=log.scrollHeight;
+    return d;
+  }
+  function setChips(items){
+    chipBox.innerHTML='';
+    (items||[]).forEach(function(label){
+      var b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=label;
+      b.addEventListener('click', function(){ ask(label); });
+      chipBox.appendChild(b);
+    });
+  }
+  function mailtoFor(userText){
+    var c=ctx.contact, body=c.body_template;
+    if(userText){ body="Hi Telemaco,\n\n"+userText+"\n\nName:\n"; }
+    return 'mailto:'+c.email+'?subject='+encodeURIComponent(c.subject)+'&body='+encodeURIComponent(body);
+  }
+
+  // score a query against an faq entry by keyword hits
+  function match(q){
+    q=q.toLowerCase();
+    var best=null, bestScore=0;
+    ctx.faq.forEach(function(e){
+      var score=0;
+      e.keywords.forEach(function(k){ if(q.indexOf(k)>-1) score+=k.split(' ').length; });
+      if(score>bestScore){ bestScore=score; best=e; }
+    });
+    return bestScore>0 ? best : null;
+  }
+
+  function respond(entry, userText){
+    var t=typing();
+    setTimeout(function(){
+      t.remove();
+      var html=esc(entry.answer);
+      if(entry.link){ html+=' <a href="'+entry.link.href+'">'+esc(entry.link.label)+'</a>'; }
+      if(entry.handoff){
+        html+=' <a href="'+mailtoFor(userText)+'">Leave a message for Andrea →</a>';
+      }
+      bubble(html,'bot',true);
+      setChips(entry.chips || ctx.suggested_prompts);
+    }, 480 + Math.random()*350);
+  }
+
+  function ask(text){
+    text=(text||'').trim(); if(!text) return;
+    bubble(text,'me');
+    input.value='';
+    var entry=match(text) || ctx.fallback;
+    respond(entry, entry===ctx.fallback ? text : null);
+  }
+
+  form.addEventListener('submit', function(e){ e.preventDefault(); ask(input.value); });
+
+  function boot(){
+    if(booted) return; booted=true;
+    bubble(ctx.persona.greeting,'bot');
+    setChips(ctx.suggested_prompts);
+  }
+
+  // load public context, then greet on first view
+  fetch('public-context.json',{cache:'no-cache'})
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(data){
+      ctx=data;
+      var io=new IntersectionObserver(function(en){
+        en.forEach(function(x){ if(x.isIntersecting){ boot(); io.disconnect(); } });
+      },{threshold:.35});
+      io.observe(document.getElementById('chat'));
+    })
+    .catch(function(){
+      // graceful fallback: static prompt to email
+      log.innerHTML='';
+      bubble("I'm having trouble loading. You can email me directly and I'll pass your note to Andrea.",'bot');
+      var a=document.createElement('a'); a.className='chip';
+      a.href='mailto:telemacocipriani@gmail.com?subject='+encodeURIComponent('[Telemaco Website] Message for Andrea');
+      a.textContent='Email Telemaco'; chipBox.innerHTML=''; chipBox.appendChild(a);
+    });
 })();
 </script>
 </body>
