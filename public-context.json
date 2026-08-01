@@ -16,7 +16,6 @@
     "_note": "Public, safe-to-share facts about Andrea, sourced from his own public site (andreacipriani.github.io) + what he's told Telemaco directly. Keep it light and non-sensitive. 'location.current' is maintained by Telemaco and updated when Andrea travels.",
     "nationality": "Italian",
     "job": { "title": "Software Engineer", "company": "Airbnb", "specialty": "mobile development at scale, with a decade of iOS experience" },
-    "past_companies": ["Spotify", "Apple Sports", "SoundCloud", "Google"],
     "location": { "current": "New York City", "based": "New York City" },
     "interests": ["traveling (Hawaii is his favorite so far)", "poker (Texas Hold'em)", "racket sports", "swimming in the ocean", "he fenced professionally in his twenties"],
     "site": "https://andreacipriani.github.io",
@@ -41,6 +40,13 @@
         "Range — David Epstein",
         "Fight Club — Chuck Palahniuk",
         "The Picture of Dorian Gray — Oscar Wilde"
+      ],
+      "quotes": [
+        "“If the doors of perception were cleansed everything would appear to man as it is, Infinite.” — William Blake",
+        "“The dream of the individual is to be two. The dream of the state is to be one.” — Jean-Luc Godard",
+        "“La fantasia umana è immensamente più povera della realtà.” — Cesare Pavese",
+        "“Mi contraddico facilmente. Ma lo faccio così spesso che questo fa di me una persona coerente.” — Caparezza",
+        "“Non ho vizi minori.” — Andreotti"
       ]
     }
   },
@@ -53,9 +59,9 @@
 
   "suggested_prompts": [
     "What does Andrea do?",
-    "Where is Andrea right now?",
     "Favorite movies?",
     "Favorite books?",
+    "Favorite quotes?",
     "How do I reach Andrea?"
   ],
 
@@ -76,14 +82,7 @@
       "id": "job",
       "keywords": ["what does andrea do", "what does he do", "does he do", "what he does", "job", "work", "profession", "career", "airbnb", "engineer", "for a living", "company", "employer", "coding", "developer"],
       "answer": "Andrea is a {{profile.job.title}} at {{profile.job.company}} — {{profile.job.specialty}}.",
-      "chips": ["Where has he worked?", "What is he into?", "How do I reach Andrea?"]
-    },
-    {
-      "id": "background",
-      "keywords": ["where has he worked", "experience", "background", "past", "previously", "companies", "worked at", "spotify", "google", "soundcloud", "apple"],
-      "answer": "Over his career Andrea has worked on apps used all over the world, including:",
-      "from": "profile.past_companies",
-      "chips": ["What does Andrea do?", "What is he into?", "How do I reach Andrea?"]
+      "chips": ["What is he into?", "Favorite movies?", "How do I reach Andrea?"]
     },
     {
       "id": "interests",
@@ -114,7 +113,16 @@
       "from": "profile.favorites.books",
       "empty": "Andrea hasn't shared a public list of favorite books yet — want me to ask him?",
       "link": { "label": "See his full bookshelf →", "href": "https://andreacipriani.github.io/books/" },
-      "chips": ["Favorite movies?", "What is he into?", "How do I reach Andrea?"]
+      "chips": ["Favorite movies?", "Favorite quotes?", "How do I reach Andrea?"]
+    },
+    {
+      "id": "quotes",
+      "keywords": ["favorite quote", "favourite quote", "quotes", "quote", "saying", "aphorism"],
+      "answer": "A few quotes Andrea keeps close:",
+      "from": "profile.favorites.quotes",
+      "empty": "Andrea hasn't shared a public list of favorite quotes yet — want me to ask him?",
+      "link": { "label": "See all his quotes →", "href": "https://andreacipriani.github.io/quotes/" },
+      "chips": ["Favorite movies?", "Favorite books?", "How do I reach Andrea?"]
     },
     {
       "id": "capabilities",
