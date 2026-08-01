@@ -21,8 +21,27 @@
     "interests": ["traveling (Hawaii is his favorite so far)", "poker (Texas Hold'em)", "racket sports", "swimming in the ocean", "he fenced professionally in his twenties"],
     "site": "https://andreacipriani.github.io",
     "favorites": {
-      "movies": [],
-      "books": []
+      "_note": "Curated shortlist for the chat; the full lists live on Andrea's site (/movies/, /books/) and are linked from the answers.",
+      "movies": [
+        "Everything Everywhere All at Once",
+        "La grande bellezza",
+        "Parasite",
+        "Amélie",
+        "Her",
+        "Requiem for a Dream",
+        "Before Sunrise",
+        "Mulholland Dr."
+      ],
+      "books": [
+        "Gödel, Escher, Bach — Douglas Hofstadter",
+        "Thinking, Fast and Slow — Daniel Kahneman",
+        "Consider the Lobster — David Foster Wallace",
+        "Norwegian Wood — Haruki Murakami",
+        "The Black Swan — Nassim Nicholas Taleb",
+        "Range — David Epstein",
+        "Fight Club — Chuck Palahniuk",
+        "The Picture of Dorian Gray — Oscar Wilde"
+      ]
     }
   },
 
@@ -85,15 +104,17 @@
       "answer": "A few of Andrea's favorite films:",
       "from": "profile.favorites.movies",
       "empty": "Andrea hasn't shared a public list of favorite films yet — want me to ask him?",
-      "chips": ["Favorite books?", "What does Andrea do?", "How do I reach Andrea?"]
+      "link": { "label": "See his full list →", "href": "https://andreacipriani.github.io/movies/" },
+      "chips": ["Favorite books?", "What is he into?", "How do I reach Andrea?"]
     },
     {
       "id": "books",
       "keywords": ["favorite book", "favourite book", "books", "reading", "read", "author"],
-      "answer": "A few of Andrea's favorite books:",
+      "answer": "A few of the books that shaped how Andrea thinks:",
       "from": "profile.favorites.books",
       "empty": "Andrea hasn't shared a public list of favorite books yet — want me to ask him?",
-      "chips": ["Favorite movies?", "Where is Andrea right now?", "How do I reach Andrea?"]
+      "link": { "label": "See his full bookshelf →", "href": "https://andreacipriani.github.io/books/" },
+      "chips": ["Favorite movies?", "What is he into?", "How do I reach Andrea?"]
     },
     {
       "id": "capabilities",
