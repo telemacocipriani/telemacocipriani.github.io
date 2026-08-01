@@ -13,9 +13,13 @@
   },
 
   "profile": {
-    "_note": "Public, safe-to-share facts about Andrea. Keep it light and non-sensitive. 'location.current' is maintained by Telemaco and updated when Andrea travels.",
-    "job": { "title": "Software Engineer", "company": "Airbnb" },
+    "_note": "Public, safe-to-share facts about Andrea, sourced from his own public site (andreacipriani.github.io) + what he's told Telemaco directly. Keep it light and non-sensitive. 'location.current' is maintained by Telemaco and updated when Andrea travels.",
+    "nationality": "Italian",
+    "job": { "title": "Software Engineer", "company": "Airbnb", "specialty": "mobile development at scale, with a decade of iOS experience" },
+    "past_companies": ["Spotify", "Apple Sports", "SoundCloud", "Google"],
     "location": { "current": "New York City", "based": "New York City" },
+    "interests": ["traveling (Hawaii is his favorite so far)", "poker (Texas Hold'em)", "racket sports", "swimming in the ocean", "he fenced professionally in his twenties"],
+    "site": "https://andreacipriani.github.io",
     "favorites": {
       "movies": [],
       "books": []
@@ -46,14 +50,28 @@
     {
       "id": "who-is-andrea",
       "keywords": ["who is andrea", "about andrea", "andrea cipriani", "tell me about him"],
-      "answer": "Andrea Cipriani is the person I work for — a {{profile.job.title}} at {{profile.job.company}}, based in {{profile.location.based}}. I'm his private assistant, not a replacement for him: I can share public bits and pass a message to him, but his personal details stay private.",
-      "chips": ["What does Andrea do?", "Favorite movies?", "How do I reach Andrea?"]
+      "answer": "Andrea Cipriani is the person I work for — an {{profile.nationality}} {{profile.job.title}} at {{profile.job.company}}, based in {{profile.location.based}}. I'm his private assistant, not a replacement for him: I can share public bits and pass a message to him, but his personal details stay private.",
+      "chips": ["What does Andrea do?", "What is he into?", "How do I reach Andrea?"]
     },
     {
       "id": "job",
-      "keywords": ["what does andrea do", "job", "work", "profession", "career", "airbnb", "engineer", "for a living", "company", "employer"],
-      "answer": "Andrea is a {{profile.job.title}} at {{profile.job.company}}.",
-      "chips": ["Where is Andrea right now?", "Favorite books?", "How do I reach Andrea?"]
+      "keywords": ["what does andrea do", "what does he do", "does he do", "what he does", "job", "work", "profession", "career", "airbnb", "engineer", "for a living", "company", "employer", "coding", "developer"],
+      "answer": "Andrea is a {{profile.job.title}} at {{profile.job.company}} — {{profile.job.specialty}}.",
+      "chips": ["Where has he worked?", "What is he into?", "How do I reach Andrea?"]
+    },
+    {
+      "id": "background",
+      "keywords": ["where has he worked", "experience", "background", "past", "previously", "companies", "worked at", "spotify", "google", "soundcloud", "apple"],
+      "answer": "Over his career Andrea has worked on apps used all over the world, including:",
+      "from": "profile.past_companies",
+      "chips": ["What does Andrea do?", "What is he into?", "How do I reach Andrea?"]
+    },
+    {
+      "id": "interests",
+      "keywords": ["interests", "hobbies", "into", "free time", "fun", "likes", "passion", "poker", "fencing", "travel", "sports", "outside work", "not coding"],
+      "answer": "A few things Andrea's into:",
+      "from": "profile.interests",
+      "chips": ["Favorite movies?", "Where is Andrea right now?", "How do I reach Andrea?"]
     },
     {
       "id": "location",
