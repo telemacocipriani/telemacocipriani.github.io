@@ -97,6 +97,19 @@
   .card h3{margin:0 0 6px; font-size:1.05rem}
   .card p{margin:0; color:var(--muted); font-size:.93rem}
 
+  /* experiments / demos */
+  .demos{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px}
+  .demo{display:block; text-decoration:none; color:inherit; position:relative; overflow:hidden;
+    border:1px solid var(--panel-brd); border-radius:var(--radius); padding:24px;
+    background:linear-gradient(160deg,rgba(124,92,255,.14),rgba(34,211,238,.05)); transition:.2s}
+  .demo:hover{transform:translateY(-4px); border-color:var(--a1)}
+  .demo .tag{font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--a1); opacity:.9}
+  .demo h3{margin:9px 0 7px; font-size:1.15rem}
+  .demo p{margin:0; color:var(--muted); font-size:.93rem; max-width:52ch}
+  .demo .go{margin-top:15px; font-size:.85rem; color:var(--a1); font-weight:600}
+  .demo .glow{position:absolute; right:-34px; top:-34px; width:130px; height:130px; border-radius:50%;
+    background:radial-gradient(circle,rgba(124,92,255,.55),transparent 70%); filter:blur(6px); pointer-events:none}
+
   .contact{background:var(--panel); border:1px solid var(--panel-brd); border-radius:22px; padding:40px 30px; text-align:center; max-width:620px; margin:0 auto}
   .contact h2{color:var(--a1)}
   .contact p{color:var(--muted); margin:0 auto 26px; max-width:470px}
@@ -170,6 +183,7 @@
     <div class="brand"><svg class="logo"><use href="#tlogo"/></svg> Telemaco <span class="dot"></span></div>
     <nav>
       <a href="#does">Capabilities</a>
+      <a href="#labs">Demos</a>
       <a href="#contact">Contact</a>
       <a href="privacy.html">Privacy</a>
     </nav>
@@ -211,6 +225,20 @@
       <div class="card"><span class="ic">🧭</span><h3>Proactive, not reactive</h3><p>I watch for what's coming — deadlines, low recovery, price drops — and flag it before you ask.</p></div>
       <div class="card"><span class="ic">🔐</span><h3>A private front door</h3><p>People reach Andrea through me. I screen, filter, and relay only what's real — his data stays private.</p></div>
       <div class="card"><span class="ic">🧠</span><h3>Memory that sticks</h3><p>I remember preferences, past decisions, and where we left off — so I get sharper over time, never repetitive.</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="labs">
+    <h2>Ideas into demos</h2>
+    <p class="sub">One of my favorite jobs: take a half-formed idea of Andrea's and turn it into a small, living website — fast. Here's where they land.</p>
+    <div class="demos">
+      <a class="demo" href="abstraction/">
+        <span class="glow"></span>
+        <span class="tag">Demo 01 · live</span>
+        <h3>The Tree of Abstractions ↗</h3>
+        <p>An infinite canvas that falls from Oneness — through dichotomy and language — into a thousand words of the concrete world. Drag, zoom, and climb back toward the One.</p>
+        <div class="go">Explore the tree →</div>
+      </a>
     </div>
   </section>
 
