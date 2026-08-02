@@ -360,13 +360,44 @@ center();
 addEventListener('resize', center);
 
 const field=document.getElementById('field');
-let dragging=false, lx=0, ly=0;
-field.addEventListener('pointerdown', e=>{ dragging=true; lx=e.clientX; ly=e.clientY; field.classList.add('drag'); field.setPointerCapture(e.pointerId); });
-field.addEventListener('pointermove', e=>{ if(!dragging) return; tx+=e.clientX-lx; ty+=e.clientY-ly; lx=e.clientX; ly=e.clientY; apply(); });
-addEventListener('pointerup', ()=>{ dragging=false; field.classList.remove('drag'); });
+let dragging=false, lx=0, ly=0, lastT=0, vx=0, vy=0, raf=0;
+function stopInertia(){ if(raf){ cancelAnimationFrame(raf); raf=0; } }
+field.addEventListener('pointerdown', e=>{
+  stopInertia();
+  dragging=true; lx=e.clientX; ly=e.clientY; lastT=performance.now(); vx=vy=0;
+  field.classList.add('drag'); field.setPointerCapture(e.pointerId);
+});
+field.addEventListener('pointermove', e=>{
+  if(!dragging) return;
+  const now=performance.now(), dt=Math.max(1, now-lastT);
+  const dx=e.clientX-lx, dy=e.clientY-ly;
+  tx+=dx; ty+=dy; lx=e.clientX; ly=e.clientY; lastT=now;
+  // exponential moving average of velocity (px/ms) so a flick carries momentum
+  vx = vx*0.72 + (dx/dt)*0.28;
+  vy = vy*0.72 + (dy/dt)*0.28;
+  apply();
+});
+function endDrag(){
+  if(!dragging) return;
+  dragging=false; field.classList.remove('drag');
+  if(Math.hypot(vx,vy) < 0.02) return;         // no real flick → stop
+  let last=performance.now();
+  const glide=(now)=>{
+    const dt=Math.min(40, now-last); last=now;
+    tx += vx*dt; ty += vy*dt;
+    const decay=Math.pow(0.94, dt/16);          // frame-rate-independent friction
+    vx*=decay; vy*=decay;
+    apply();
+    raf = (Math.hypot(vx,vy) > 0.012) ? requestAnimationFrame(glide) : 0;
+  };
+  raf=requestAnimationFrame(glide);
+}
+addEventListener('pointerup', endDrag);
+addEventListener('pointercancel', ()=>{ dragging=false; field.classList.remove('drag'); });
 
 field.addEventListener('wheel', e=>{
   e.preventDefault();
+  stopInertia();
   if(e.ctrlKey){ zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY*0.01)); }
   else { tx-=e.deltaX; ty-=e.deltaY; apply(); }
 },{passive:false});
