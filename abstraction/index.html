@@ -3,35 +3,29 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>ONE — a ladder of abstraction</title>
-<meta name="description" content="From ONE, downward: a vertical tree of words that splits from unity into dichotomy, language, and the concrete world. Drag, scroll, pinch to roam.">
+<title>ONENESS — a ladder of abstraction</title>
+<meta name="description" content="From Oneness, downward: a vast tree of a thousand words that splits from unity into dichotomy, language, and the whole named world. Drag, scroll, pinch to roam — climb up to reach the One.">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <style>
   :root{
     --void:#050507; --bone:#f4f1e8; --dim:#3a3a46;
     --c-root:#ffffff;
-    --c-sign:#ff1f6b;      /* hot magenta */
-    --c-meaning:#25ffb0;   /* acid green */
-    --c-sound:#ffd200;     /* electric yellow */
-    --c-mark:#3d7bff;      /* voltage blue */
+    --c-1:#ff1f6b; --c-2:#25ffb0; --c-3:#ffd200; --c-4:#3d7bff; --c-5:#ff6a1a;
+    --c-6:#16e0ff; --c-7:#b061ff; --c-8:#ff4d6d; --c-9:#7cff3d; --c-10:#ff9e00;
   }
   *{box-sizing:border-box; margin:0; padding:0}
   html,body{height:100%; overflow:hidden; background:var(--void); color:var(--bone);
     font-family:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
     -webkit-font-smoothing:antialiased; overscroll-behavior:none;}
-  /* the boundless field you drag through */
   #field{position:fixed; inset:0; cursor:grab; touch-action:none;
     background-color:var(--void);
     background-image:radial-gradient(rgba(255,255,255,.05) 1px, transparent 1.4px);
     background-size:52px 52px;}
   #field.drag{cursor:grabbing}
-  /* vignette */
   #field::after{content:""; position:fixed; inset:0; pointer-events:none; z-index:2;
-    background:radial-gradient(ellipse at 50% 38%, transparent 34%, rgba(0,0,0,.82) 100%);}
-  /* scanlines — the edgy overlay */
+    background:radial-gradient(ellipse at 50% 42%, transparent 30%, rgba(0,0,0,.84) 100%);}
   #scan{position:fixed; inset:0; pointer-events:none; z-index:3; mix-blend-mode:overlay; opacity:.5;
     background:repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px);}
-  /* the transformed stage that actually holds the tree */
   #stage{position:absolute; top:0; left:0; transform-origin:0 0; will-change:transform;}
   #wires{position:absolute; top:0; left:0; overflow:visible; pointer-events:none;}
   #wires .spine{stroke:var(--bone); stroke-width:2.2; stroke-opacity:.6; fill:none;
@@ -40,30 +34,28 @@
   .node{position:absolute; transform:translate(-50%,-50%); white-space:nowrap;
     pointer-events:auto; cursor:default; line-height:1; user-select:none;
     transition:opacity .3s, filter .3s;}
-  .node .w{display:inline-block}
-  /* abstract tiers: display serif, shouted */
+  .node .w{display:inline-block; transition:opacity .18s}
   .node.tier0 .w,.node.tier1 .w,.node.tier2 .w{
     font-family:"Times New Roman",Georgia,serif; text-transform:uppercase; letter-spacing:.05em; font-weight:600;}
-  /* concrete tiers: lowercase machine type */
   .node.tier3 .w,.node.tier4 .w{ text-transform:lowercase; letter-spacing:.02em;}
   .node:hover{filter:brightness(1.4)}
-  /* the root breathes */
-  @keyframes breathe{0%,100%{filter:brightness(.92)} 50%{filter:brightness(1.45)}}
+  @keyframes breathe{0%,100%{filter:brightness(.9)} 50%{filter:brightness(1.5)}}
+  .node.tier0{cursor:pointer}
   .node.tier0 .w{animation:breathe 3.6s ease-in-out infinite;}
   .node .tag{display:block; font-family:"SF Mono",ui-monospace,monospace; text-transform:uppercase;
     font-size:9px; letter-spacing:.3em; opacity:.34; margin-bottom:6px; font-weight:400;}
-  /* fixed chrome */
   .hud{position:fixed; pointer-events:none; z-index:5; color:var(--bone);
     font-size:10px; letter-spacing:.36em; text-transform:uppercase; opacity:.5;}
   #axisTop{top:16px; left:50%; transform:translateX(-50%);}
   #axisBot{bottom:16px; left:50%; transform:translateX(-50%);}
-  #title{top:16px; left:18px; max-width:250px; letter-spacing:.3em; opacity:.66; line-height:1.95;}
+  #title{top:16px; left:18px; max-width:260px; letter-spacing:.3em; opacity:.66; line-height:1.95;}
   #title b{display:block; font-size:16px; letter-spacing:.42em; color:#fff; opacity:1}
   #title .sub{opacity:.5; font-size:9px}
-  #hint{bottom:16px; left:18px; opacity:.4}
-  #back{top:16px; right:18px; pointer-events:auto; text-decoration:none; color:var(--bone);
-    opacity:.5; font-size:10px; letter-spacing:.28em; text-transform:uppercase; border:1px solid var(--dim);
-    padding:7px 11px; border-radius:2px; transition:.2s}
+  #hint{top:100px; left:18px; opacity:.42; max-width:250px; line-height:1.7}
+  /* link back to the site lives at the BOTTOM now */
+  #back{bottom:18px; left:18px; pointer-events:auto; text-decoration:none; color:var(--bone);
+    opacity:.55; font-size:10px; letter-spacing:.28em; text-transform:uppercase; border:1px solid var(--dim);
+    padding:7px 11px; border-radius:2px; transition:.2s; position:fixed; z-index:6}
   #back:hover{opacity:1; border-color:var(--bone)}
   #z{position:fixed; bottom:16px; right:18px; z-index:5; display:flex; gap:8px}
   #z button{width:34px; height:34px; background:transparent; color:var(--bone); border:1px solid var(--dim);
@@ -80,112 +72,285 @@
 </div>
 <div id="scan"></div>
 
-<div class="hud" id="title"><b>ONE</b><span class="sub">from unity, downward —<br>dichotomy · language · world</span></div>
-<div class="hud" id="axisTop">▲ more abstract</div>
-<div class="hud" id="axisBot">more concrete ▼</div>
-<div class="hud" id="hint">drag · scroll · pinch to zoom</div>
+<div class="hud" id="title"><b>ONENESS</b><span class="sub">from unity, everything —<br>dichotomy · language · world</span></div>
+<div class="hud" id="axisTop">▲ the one</div>
+<div class="hud" id="axisBot">the world ▼</div>
+<div class="hud" id="hint">you begin in the world below · drag up to climb toward the One · scroll · pinch to zoom</div>
 <a id="back" href="../">← telemaco</a>
 <div id="z"><button id="zout" aria-label="zoom out">−</button><button id="zin" aria-label="zoom in">+</button></div>
 
 <script>
-/* ---------- the tree: a single stalk descending from unity, then splitting into the world ---------- */
-/* Spine (One → Dichotomy → Language) named by Andrea. Everything below is the descent into the concrete. */
-const TREE = { w:'One', c:[
-  { w:'Dichotomy', c:[
-    { w:'Language', c:[
-      { w:'Sign', c:[
-        { w:'Word', c:[ {w:'noun'},{w:'verb'},{w:'name'} ] },
-        { w:'Symbol', c:[ {w:'letter'},{w:'number'},{w:'glyph'} ] },
-      ]},
-      { w:'Meaning', c:[
-        { w:'Concept', c:[ {w:'time'},{w:'self'},{w:'truth'} ] },
-        { w:'Feeling', c:[ {w:'joy'},{w:'fear'},{w:'longing'} ] },
-      ]},
-      { w:'Sound', c:[
-        { w:'Voice', c:[ {w:'vowel'},{w:'consonant'} ] },
-        { w:'Song', c:[ {w:'note'},{w:'rhythm'},{w:'silence'} ] },
-      ]},
-      { w:'Mark', c:[
-        { w:'Writing', c:[ {w:'alphabet'},{w:'ink'} ] },
-        { w:'Code', c:[ {w:'binary'},{w:'cipher'} ] },
-      ]},
-    ]},
-  ]},
-]};
+/* ---------- helpers ---------- */
+const L = (...w) => w.map(x => ({ w:x }));
+const N = (w, ...c) => ({ w, c });
 
-/* accent is decided by the family node (the children of Language, at depth 3) */
-const BRANCH = { Sign:'--c-sign', Meaning:'--c-meaning', Sound:'--c-sound', Mark:'--c-mark' };
-const ACCENT_DEPTH = 3;
+/* ---------- the tree ----------
+   Spine (Oneness → Dichotomy → Language) named by Andrea.
+   Below Language hangs the whole named world — 1000+ words. */
+const TREE = N('Oneness',
+  N('Dichotomy',
+    N('Language',
 
-/* ---------- layout: leaves get sequential columns, parents center over children ---------- */
-const COLW = 150, ROWH = 234;   /* taller: the ladder stretches vertically */
+      N('Nature',
+        N('cosmos',
+          N('star', ...L('sun','sirius','vega','rigel','polaris','antares')),
+          N('planet', ...L('mercury','venus','earth','mars','jupiter','saturn','neptune')),
+          N('body', ...L('moon','comet','asteroid','meteor','nebula','galaxy','quasar','pulsar','void')) ),
+        N('weather',
+          N('sky', ...L('cloud','rain','snow','hail','fog','mist','dew','frost','wind')),
+          N('storm', ...L('thunder','lightning','hurricane','tornado','blizzard','gale','monsoon')),
+          N('light', ...L('sunlight','rainbow','aurora','shadow','dusk','dawn','twilight')) ),
+        N('land',
+          N('relief', ...L('mountain','hill','valley','plateau','canyon','cliff','cave','dune','ridge')),
+          N('biome', ...L('forest','desert','tundra','savanna','jungle','swamp','prairie','reef')),
+          N('water', ...L('ocean','sea','lake','river','stream','waterfall','glacier','spring','delta')) ),
+        N('mineral',
+          N('stone', ...L('granite','marble','quartz','obsidian','slate','flint','basalt')),
+          N('gem', ...L('diamond','ruby','emerald','sapphire','opal','jade','amber','topaz')),
+          N('metal', ...L('gold','silver','iron','copper','tin','lead','zinc','titanium','mercury')) ) ),
+
+      N('Life',
+        N('animal',
+          N('mammal', ...L('dog','cat','horse','cow','pig','sheep','goat','camel','donkey','lion','tiger','bear','wolf','fox','deer','rabbit','hare','mouse','otter','seal','whale','dolphin','elephant','giraffe','monkey','bat')),
+          N('bird', ...L('eagle','hawk','owl','sparrow','robin','crow','raven','swan','duck','goose','penguin','ostrich','parrot','falcon','heron')),
+          N('fish', ...L('salmon','trout','tuna','shark','cod','herring','eel','carp','bass','pike')),
+          N('reptile', ...L('snake','lizard','turtle','crocodile','gecko','iguana','chameleon','viper')),
+          N('amphibian', ...L('frog','toad','newt','salamander')),
+          N('insect', ...L('ant','bee','wasp','beetle','butterfly','moth','fly','mosquito','dragonfly','grasshopper','cricket','ladybug')),
+          N('sea', ...L('crab','lobster','shrimp','octopus','squid','jellyfish','starfish','coral','oyster','clam')) ),
+        N('plant',
+          N('tree', ...L('oak','pine','maple','birch','willow','cedar','redwood','palm','baobab','olive')),
+          N('flower', ...L('rose','tulip','lily','daisy','orchid','sunflower','lotus','iris','jasmine','poppy')),
+          N('crop', ...L('wheat','rice','corn','barley','oat','soy','potato','bean','pea','millet')),
+          N('herb', ...L('basil','mint','thyme','sage','rosemary','parsley','oregano','dill')) ),
+        N('other',
+          N('fungus', ...L('mushroom','yeast','mold','truffle','lichen')),
+          N('microbe', ...L('bacterium','virus','amoeba','algae','plankton','microbe')) ) ),
+
+      N('Body',
+        N('part', ...L('head','neck','shoulder','arm','elbow','hand','finger','chest','back','hip','leg','knee','foot','toe')),
+        N('organ', ...L('heart','brain','lung','liver','kidney','stomach','skin','eye','ear','tongue')),
+        N('tissue', ...L('nerve','muscle','bone','blood','vein','artery','tendon','cartilage')) ),
+
+      N('Mind',
+        N('emotion',
+          N('joy', ...L('happiness','delight','elation','bliss','glee','contentment')),
+          N('sorrow', ...L('grief','sadness','melancholy','despair','regret','loneliness')),
+          N('fear', ...L('anxiety','dread','panic','terror','worry','unease')),
+          N('anger', ...L('rage','fury','irritation','resentment','wrath','spite')),
+          N('love', ...L('affection','passion','tenderness','desire','devotion','longing')) ),
+        N('thought',
+          N('reason', ...L('logic','deduction','inference','analysis','judgment')),
+          N('idea', ...L('concept','notion','theory','hypothesis','insight','intuition')),
+          N('memory', ...L('recollection','nostalgia','remembrance','reverie')),
+          N('imagination', ...L('fantasy','dream','vision','daydream','invention')) ),
+        N('perception',
+          N('sense', ...L('sight','hearing','smell','taste','touch')),
+          N('state', ...L('awareness','attention','focus','trance','sleep','wakefulness')) ),
+        N('character',
+          N('virtue', ...L('courage','honesty','patience','kindness','wisdom','humility','justice')),
+          N('vice', ...L('greed','envy','pride','sloth','gluttony','vanity','cruelty')) ) ),
+
+      N('Society',
+        N('family', ...L('mother','father','sister','brother','daughter','son','aunt','uncle','cousin','grandmother','grandfather')),
+        N('profession',
+          N('trade', ...L('carpenter','plumber','electrician','mason','blacksmith','baker','butcher','tailor')),
+          N('care', ...L('doctor','nurse','surgeon','dentist','therapist','pharmacist')),
+          N('learned', ...L('teacher','professor','scientist','engineer','lawyer','accountant','architect')),
+          N('creative', ...L('painter','musician','writer','actor','dancer','sculptor','poet')),
+          N('public', ...L('soldier','officer','firefighter','judge','politician','diplomat')) ),
+        N('institution', ...L('school','university','hospital','court','parliament','church','bank','museum','library','prison')),
+        N('economy', ...L('market','trade','money','tax','wage','profit','debt','currency','stock','wealth')),
+        N('politics', ...L('democracy','monarchy','republic','empire','anarchy','oligarchy','nation','state','treaty','borders')) ),
+
+      N('Culture',
+        N('art', ...L('painting','sculpture','drawing','photography','mosaic','fresco','collage')),
+        N('music',
+          N('genre', ...L('jazz','rock','classical','blues','folk','pop','opera','techno')),
+          N('instrument', ...L('guitar','piano','violin','drum','flute','trumpet','cello','harp','saxophone')) ),
+        N('literature', ...L('novel','poem','essay','drama','myth','fable','epic','sonnet')),
+        N('stage', ...L('dance','theater','ballet','circus','film','puppetry','mime')),
+        N('festival', ...L('carnival','wedding','feast','parade','ceremony','ritual')) ),
+
+      N('Artifact',
+        N('tool', ...L('hammer','mallet','wrench','screwdriver','saw','drill','axe','chisel','clamp','level','pliers','shovel','file')),
+        N('vehicle',
+          N('land', ...L('car','bicycle','truck','train','motorcycle','bus','tram')),
+          N('air', ...L('airplane','helicopter','rocket','glider','balloon','drone')),
+          N('water', ...L('boat','ship','canoe','submarine','yacht','ferry')) ),
+        N('building', ...L('house','tower','bridge','castle','temple','stadium','skyscraper','cathedral','barn','lighthouse')),
+        N('clothing', ...L('shirt','trousers','dress','coat','hat','shoe','glove','scarf','sock','jacket')),
+        N('furniture', ...L('chair','table','bed','sofa','desk','shelf','cabinet','stool','wardrobe')),
+        N('machine', ...L('engine','motor','computer','robot','turbine','pump','generator','printer')),
+        N('weapon', ...L('sword','spear','bow','gun','cannon','dagger','shield','mace')) ),
+
+      N('Dwelling',
+        N('room', ...L('kitchen','bedroom','bathroom','parlor','attic','basement','garage','hallway','balcony','study')),
+        N('object', ...L('lamp','mirror','clock','vase','carpet','curtain','pillow','blanket','candle','frame')),
+        N('supply', ...L('broom','bucket','ladder','rope','nail','glue','tape','scissors','needle','thread')) ),
+
+      N('Food',
+        N('dish', ...L('pizza','pasta','risotto','gnocchi','sushi','ramen','curry','taco','paella','burger','salad','stew','omelette')),
+        N('ingredient', ...L('flour','sugar','butter','egg','milk','oil','yeast','vinegar')),
+        N('fruit', ...L('apple','pear','peach','plum','cherry','grape','lemon','banana','mango','fig')),
+        N('vegetable', ...L('carrot','onion','garlic','pepper','spinach','broccoli','cabbage','celery','cucumber','eggplant')),
+        N('drink', ...L('water','tea','coffee','wine','beer','juice','cider','cocktail','soda','cocoa')),
+        N('spice', ...L('cinnamon','ginger','clove','nutmeg','saffron','cumin','paprika','pepper')) ),
+
+      N('Sport',
+        N('ball', ...L('soccer','basketball','tennis','baseball','volleyball','rugby','cricket','golf','hockey','badminton')),
+        N('water', ...L('swimming','surfing','rowing','diving','sailing','kayaking')),
+        N('combat', ...L('boxing','wrestling','judo','karate','fencing','taekwondo')),
+        N('outdoor', ...L('skiing','climbing','cycling','running','hiking','skating')) ),
+
+      N('Knowledge',
+        N('science',
+          N('physics', ...L('gravity','energy','force','motion','light','heat','sound','magnetism','electricity')),
+          N('chemistry', ...L('atom','molecule','element','acid','base','reaction','compound','ion')),
+          N('biology', ...L('cell','gene','protein','evolution','organism','tissue','enzyme')),
+          N('mathematics', ...L('number','equation','geometry','algebra','calculus','probability','topology')) ),
+        N('philosophy', ...L('ethics','logic','metaphysics','aesthetics','epistemology','ontology')),
+        N('history', ...L('era','empire','revolution','dynasty','war','migration','civilization')) ),
+
+      N('Speech',
+        N('tongue', ...L('italian','english','french','spanish','german','greek','latin','arabic','hindi','mandarin','japanese','russian','swahili','turkish')),
+        N('grammar', ...L('noun','verb','adjective','adverb','pronoun','preposition','conjunction')),
+        N('script', ...L('alphabet','cyrillic','kanji','hieroglyph','runes','braille')) ),
+
+      N('Technology',
+        N('computing', ...L('software','hardware','algorithm','network','database','server','cloud','pixel','code','bit')),
+        N('device', ...L('phone','laptop','camera','sensor','battery','screen','chip','router','speaker','keyboard')),
+        N('ai', ...L('model','neuron','dataset','prompt','token','agent','inference','training')),
+        N('energy', ...L('solar','wind','nuclear','coal','oil','hydro','fusion','grid')) ),
+
+      N('Geography',
+        N('continent', ...L('africa','asia','europe','americas','oceania','antarctica')),
+        N('country', ...L('italy','france','spain','germany','greece','egypt','india','china','japan','brazil','mexico','canada','kenya','norway','turkey')),
+        N('city', ...L('rome','paris','london','berlin','geneva','zurich','bern','cairo','tokyo','delhi','lugano','milan','venice','athens','madrid','oslo','lisbon')),
+        N('region', ...L('alps','sahara','amazon','himalaya','tuscany','patagonia','siberia','riviera')) ),
+
+      N('Myth',
+        N('deity', ...L('zeus','athena','apollo','hades','poseidon','hermes','odin','thor','ra','vishnu')),
+        N('creature', ...L('dragon','phoenix','griffin','sphinx','centaur','minotaur','siren','chimera')),
+        N('realm', ...L('heaven','hell','olympus','valhalla','eden','elysium','underworld','nirvana')),
+        N('sacred', ...L('fate','soul','spirit','oracle','prophecy','omen','ritual','relic')) ),
+
+      N('Motion',
+        N('move', ...L('walk','run','jump','crawl','swim','fly','climb','fall','spin','slide')),
+        N('make', ...L('build','carve','paint','write','cook','sew','forge','plant','draw','sculpt')),
+        N('speak', ...L('talk','shout','whisper','sing','recite','argue','narrate')),
+        N('exchange', ...L('give','take','trade','buy','sell','lend','borrow','share')) ),
+
+      N('Quality',
+        N('taste', ...L('sweet','sour','bitter','salty','savory','spicy','tangy')),
+        N('texture', ...L('smooth','rough','soft','hard','sharp','sticky','silky','coarse')),
+        N('sound', ...L('loud','quiet','shrill','mellow','crisp','deep','muffled','hollow')),
+        N('scent', ...L('fragrant','pungent','musky','fresh','floral','smoky')) ),
+
+      N('Measure',
+        N('unit', ...L('meter','gram','liter','second','watt','volt','ampere','kelvin','mole','hertz')),
+        N('form', ...L('arc','angle','curve','vertex','plane','axis','radius','diameter')),
+        N('bearing', ...L('north','south','east','west','up','down','left','right')) ),
+
+      N('Abstract',
+        N('number', ...L('zero','one','two','three','seven','ten','hundred','thousand','million','infinity')),
+        N('shape', ...L('point','line','circle','triangle','square','pentagon','hexagon','sphere','cube','spiral')),
+        N('quantity', ...L('none','some','many','all','few','half','double','whole')),
+        N('time', ...L('moment','second','minute','hour','day','week','month','year','century','eternity')),
+        N('space', ...L('here','there','near','far','above','below','inside','outside','center','edge')),
+        N('relation', ...L('same','different','equal','opposite','part','whole','cause','effect')),
+        N('color', ...L('red','orange','yellow','green','blue','indigo','violet','black','white','gray')),
+        N('value', ...L('good','evil','beauty','truth','justice','freedom','order','chaos','meaning','peace','hope')) )
+
+    )
+  )
+);
+
+/* ---------- accents: each domain (depth 3) gets a neon; children inherit ---------- */
+const PALETTE = ['--c-1','--c-2','--c-3','--c-4','--c-5','--c-6','--c-7','--c-8','--c-9','--c-10'];
+let dIdx = 0;
+
+/* ---------- layout ---------- */
+const COLW = 122, ROWH = 246;   /* taller rows = a deeper drop */
 let nodes=[], edges=[], leaf=0, maxDepth=0;
-function walk(n, parent, depth, branch){
+function walk(n, parent, depth, accent){
   n.depth=depth; n.parent=parent||null;
-  n.branch = depth===ACCENT_DEPTH ? n.w : (depth>ACCENT_DEPTH ? branch : null);
+  if(depth===3){ n.accent = PALETTE[dIdx++ % PALETTE.length]; }
+  else if(depth>3){ n.accent = accent; }
+  else { n.accent = null; }
   maxDepth=Math.max(maxDepth,depth);
   nodes.push(n);
   if(parent) edges.push([parent,n]);
   if(n.c && n.c.length){
-    n.c.forEach(ch=>walk(ch,n,depth+1,n.branch));
+    n.c.forEach(ch=>walk(ch,n,depth+1,n.accent));
     n.x = (n.c[0].x + n.c[n.c.length-1].x)/2;
   } else { n.x = leaf++; }
 }
 walk(TREE,null,0,null);
 
 const css = getComputedStyle(document.documentElement);
-function color(n){ return n.branch && BRANCH[n.branch] ? css.getPropertyValue(BRANCH[n.branch]).trim() : css.getPropertyValue('--c-root').trim(); }
+function color(n){ return n.accent ? css.getPropertyValue(n.accent).trim() : css.getPropertyValue('--c-root').trim(); }
 function px(n){ return { x:n.x*COLW, y:n.depth*ROWH }; }
 
 const stage=document.getElementById('stage'), wires=document.getElementById('wires');
 
-/* edges — spine gets a bright animated plumb line; branches are hair-thin neon curves */
+/* edges — bright animated spine for One→Dichotomy→Language; hair-thin neon curves below */
 let paths='';
 edges.forEach(([p,c])=>{
   const a=px(p), b=px(c), my=(a.y+b.y)/2;
   const d = `M${a.x} ${a.y+8} C ${a.x} ${my}, ${b.x} ${my}, ${b.x} ${b.y-8}`;
-  if(c.depth<=2){ // the One → Dichotomy → Language spine
+  if(c.depth<=2){
     paths += `<path class="spine" d="${d}"/>`;
   } else {
-    paths += `<path d="${d}" fill="none" stroke="${color(c)}" stroke-width="1" stroke-opacity="${0.16+c.depth*0.06}"/>`;
+    paths += `<path d="${d}" fill="none" stroke="${color(c)}" stroke-width="1" stroke-opacity="${Math.min(0.5,0.12+c.depth*0.05)}"/>`;
   }
 });
 wires.innerHTML=paths;
 
 /* nodes */
-const SIZE=[78,52,39,27,18,13];   // font px by depth (abstract → concrete)
-let minX=1e9,maxX=-1e9,maxY=0;
+const SIZE=[88,54,40,29,21,15,11];
+let minX=1e9,maxX=-1e9,maxY=0, rootEl=null;
 nodes.forEach(n=>{
   const p=px(n);
   minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y);
   const el=document.createElement('div');
   el.className='node tier'+Math.min(n.depth,4);
   el.style.left=p.x+'px'; el.style.top=p.y+'px';
-  const size=SIZE[Math.min(n.depth,5)];
+  const size=SIZE[Math.min(n.depth,6)];
   const col=color(n);
   const tag = n.depth<=2 ? `<span class="tag">tier ${n.depth}</span>` : '';
-  // spine nodes get a chromatic glow; the root gets a hard chromatic split
   let shadow;
-  if(n.depth===0) shadow = `-3px 0 24px #ff1f6b88, 3px 0 24px #3d7bff88, 0 0 40px #ffffff66`;
+  if(n.depth===0) shadow = `-3px 0 26px #ff1f6b88, 3px 0 26px #3d7bff88, 0 0 44px #ffffff66`;
   else if(n.depth<=2) shadow = `0 0 30px #ffffff55, 0 0 8px #ffffff88`;
-  else shadow = `0 0 ${10}px ${col}22`;
+  else shadow = `0 0 10px ${col}22`;
   el.innerHTML = tag + `<span class="w" style="font-size:${size}px; color:${col}; `
     + `opacity:${n.depth<=1?0.95:1}; text-shadow:${shadow}">${n.w}</span>`;
   stage.appendChild(el);
+  if(n.depth===0) rootEl=el;
 });
 
-/* size the svg so curves aren't clipped */
 wires.setAttribute('width', (maxX-minX)+COLW);
 wires.setAttribute('height', maxY+ROWH);
+
+/* ---------- root label rotates on hover: Oneness → God → Tao → 1 ---------- */
+const ROT=['Oneness','God','Tao','1'];
+let rIdx=0, rTimer=null;
+const rootW = rootEl.querySelector('.w');
+function setRoot(t){ rootW.style.opacity=0; setTimeout(()=>{ rootW.textContent=t; rootW.style.opacity=0.95; },120); }
+rootEl.addEventListener('pointerenter', ()=>{
+  if(rTimer) return;
+  rTimer=setInterval(()=>{ rIdx=(rIdx+1)%ROT.length; setRoot(ROT[rIdx]); }, 820);
+});
+rootEl.addEventListener('pointerleave', ()=>{ clearInterval(rTimer); rTimer=null; rIdx=0; setRoot('Oneness'); });
 
 /* ---------- pan + zoom ---------- */
 let tx=0, ty=0, s=1;
 function apply(){ stage.style.transform=`translate(${tx}px,${ty}px) scale(${s})`; }
 function center(){
-  const vw=innerWidth, root=px(nodes[0]);
-  s = vw<640 ? 0.58 : 0.82;
-  tx = vw/2 - root.x*s;
-  ty = 108;
+  const vw=innerWidth, vh=innerHeight, root=px(nodes[0]);
+  s = vw<640 ? 0.9 : 1.15;                 // zoomed in enough that the tree runs taller than the screen
+  tx = vw/2 - root.x*s;                     // horizontally centered on the spine
+  ty = vh - 96 - maxY*s;                    // deepest words rest near the bottom → drag up to reach the One
   apply();
 }
 center();
@@ -199,21 +364,18 @@ addEventListener('pointerup', ()=>{ dragging=false; field.classList.remove('drag
 
 field.addEventListener('wheel', e=>{
   e.preventDefault();
-  if(e.ctrlKey){ // trackpad pinch / ctrl-scroll → zoom about cursor
-    zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY*0.01));
-  } else {       // otherwise it's boundless scroll through the void
-    tx-=e.deltaX; ty-=e.deltaY; apply();
-  }
+  if(e.ctrlKey){ zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY*0.01)); }
+  else { tx-=e.deltaX; ty-=e.deltaY; apply(); }
 },{passive:false});
 
 function zoomAt(cx,cy,factor){
-  const ns=Math.min(2.4, Math.max(0.16, s*factor));
+  const ns=Math.min(2.6, Math.max(0.05, s*factor));
   tx = cx - (cx-tx)*(ns/s);
   ty = cy - (cy-ty)*(ns/s);
   s = ns; apply();
 }
-document.getElementById('zin').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,1.2);
-document.getElementById('zout').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,1/1.2);
+document.getElementById('zin').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,1.25);
+document.getElementById('zout').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,1/1.25);
 </script>
 </body>
 </html>
