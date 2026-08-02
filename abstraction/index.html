@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>LADDER OF ABSTRACTION — a tree of words</title>
+<meta name="description" content="A vertical tree of words: the higher you climb, the more abstract the concept. Drag, scroll, pinch to roam.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+  :root{
+    --void:#07070a; --bone:#eae6dc; --dim:#4a4a56;
+    --c-root:#eae6dc;
+    --c-abstraction:#ff2e88;  /* magenta */
+    --c-organism:#2affa6;     /* acid green */
+    --c-artifact:#ffd400;     /* yellow */
+    --c-place:#4d7cff;        /* electric blue */
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%; overflow:hidden; background:var(--void); color:var(--bone);
+    font-family:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
+    -webkit-font-smoothing:antialiased; overscroll-behavior:none;}
+  /* the boundless field you drag through */
+  #field{position:fixed; inset:0; cursor:grab; touch-action:none;
+    background-color:var(--void);
+    background-image:radial-gradient(rgba(255,255,255,.055) 1px, transparent 1.4px);
+    background-size:46px 46px;}
+  #field.drag{cursor:grabbing}
+  #field::after{content:""; position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(0,0,0,.72) 100%);}
+  /* the transformed stage that actually holds the tree */
+  #stage{position:absolute; top:0; left:0; transform-origin:0 0; will-change:transform;}
+  #wires{position:absolute; top:0; left:0; overflow:visible; pointer-events:none;}
+  .node{position:absolute; transform:translate(-50%,-50%); white-space:nowrap;
+    pointer-events:auto; cursor:default; line-height:1; user-select:none;
+    transition:opacity .3s, filter .3s;}
+  .node .w{display:inline-block}
+  /* abstract tiers: display serif, shouted */
+  .node.tier0 .w,.node.tier1 .w,.node.tier2 .w{
+    font-family:"Times New Roman",Georgia,serif; text-transform:uppercase; letter-spacing:.04em; font-weight:600;}
+  /* concrete tiers: lowercase machine type */
+  .node.tier3 .w,.node.tier4 .w{ text-transform:lowercase; letter-spacing:.02em;}
+  .node:hover{filter:brightness(1.35)}
+  .node .tag{display:block; font-family:"SF Mono",ui-monospace,monospace; text-transform:uppercase;
+    font-size:9px; letter-spacing:.28em; opacity:.32; margin-bottom:5px; font-weight:400;}
+  /* fixed chrome */
+  .hud{position:fixed; pointer-events:none; z-index:5; color:var(--bone);
+    font-size:10px; letter-spacing:.34em; text-transform:uppercase; opacity:.5;}
+  #axisTop{top:16px; left:50%; transform:translateX(-50%);}
+  #axisBot{bottom:16px; left:50%; transform:translateX(-50%);}
+  #title{top:16px; left:18px; max-width:230px; letter-spacing:.28em; opacity:.62; line-height:1.9;}
+  #title b{display:block; font-size:15px; letter-spacing:.32em; color:#fff; opacity:1}
+  #title .sub{opacity:.55; font-size:9px}
+  #hint{bottom:16px; left:18px; opacity:.4}
+  #back{top:16px; right:18px; pointer-events:auto; text-decoration:none; color:var(--bone);
+    opacity:.5; font-size:10px; letter-spacing:.28em; text-transform:uppercase; border:1px solid var(--dim);
+    padding:7px 11px; border-radius:2px; transition:.2s}
+  #back:hover{opacity:1; border-color:var(--bone)}
+  #z{position:fixed; bottom:16px; right:18px; z-index:5; display:flex; gap:8px}
+  #z button{width:34px; height:34px; background:transparent; color:var(--bone); border:1px solid var(--dim);
+    font:inherit; font-size:16px; cursor:pointer; border-radius:2px; opacity:.6; transition:.2s}
+  #z button:hover{opacity:1; border-color:var(--bone)}
+  @media (max-width:640px){ #title{display:none} .node .tag{display:none} }
+</style>
+</head>
+<body>
+<div id="field">
+  <div id="stage">
+    <svg id="wires"></svg>
+  </div>
+</div>
+
+<div class="hud" id="title"><b>LADDER OF<br>ABSTRACTION</b><span class="sub">↑ general · concrete ↓<br>a tree of words</span></div>
+<div class="hud" id="axisTop">▲ more abstract</div>
+<div class="hud" id="axisBot">more concrete ▼</div>
+<div class="hud" id="hint">drag · scroll · pinch to zoom</div>
+<a id="back" href="../">← telemaco</a>
+<div id="z"><button id="zout" aria-label="zoom out">−</button><button id="zin" aria-label="zoom in">+</button></div>
+
+<script>
+/* ---------- the tree (best-guess hypernym hierarchy; higher = more abstract) ---------- */
+/* Swap / reorder freely later — Andrea will name the words that sit at the top. */
+const TREE = { w:'entity', c:[
+  { w:'abstraction', c:[
+    { w:'property', c:[
+      { w:'color', c:[ {w:'red'},{w:'blue'},{w:'green'} ] },
+      { w:'shape', c:[ {w:'circle'},{w:'square'},{w:'spiral'} ] },
+    ]},
+    { w:'emotion', c:[ {w:'joy'},{w:'fear'},{w:'anger'},{w:'longing'} ] },
+    { w:'quantity', c:[
+      { w:'number', c:[ {w:'one'},{w:'two'},{w:'infinity'} ] },
+    ]},
+  ]},
+  { w:'organism', c:[
+    { w:'animal', c:[
+      { w:'mammal', c:[ {w:'dog'},{w:'cat'},{w:'whale'} ] },
+      { w:'bird', c:[ {w:'eagle'},{w:'sparrow'},{w:'owl'} ] },
+      { w:'fish', c:[ {w:'salmon'},{w:'shark'} ] },
+    ]},
+    { w:'plant', c:[
+      { w:'tree', c:[ {w:'oak'},{w:'pine'} ] },
+      { w:'flower', c:[ {w:'rose'},{w:'tulip'} ] },
+    ]},
+  ]},
+  { w:'artifact', c:[
+    { w:'tool', c:[ {w:'hammer'},{w:'wrench'} ] },
+    { w:'vehicle', c:[ {w:'car'},{w:'bicycle'},{w:'rocket'} ] },
+    { w:'instrument', c:[ {w:'guitar'},{w:'piano'} ] },
+  ]},
+  { w:'place', c:[
+    { w:'nature', c:[ {w:'mountain'},{w:'river'} ] },
+    { w:'settlement', c:[ {w:'city'},{w:'house'} ] },
+  ]},
+]};
+
+const BRANCH = { abstraction:'--c-abstraction', organism:'--c-organism', artifact:'--c-artifact', place:'--c-place' };
+
+/* ---------- layout: leaves get sequential columns, parents center over children ---------- */
+const COLW = 168, ROWH = 176;
+let nodes=[], edges=[], leaf=0, maxDepth=0;
+function walk(n, parent, depth, branch){
+  n.depth=depth; n.parent=parent||null;
+  n.branch = depth===1 ? n.w : branch;      // level-1 ancestor decides the accent
+  maxDepth=Math.max(maxDepth,depth);
+  nodes.push(n);
+  if(parent) edges.push([parent,n]);
+  if(n.c && n.c.length){
+    n.c.forEach(ch=>walk(ch,n,depth+1,n.branch));
+    n.x = (n.c[0].x + n.c[n.c.length-1].x)/2;
+  } else { n.x = leaf++; }
+}
+walk(TREE,null,0,null);
+
+const css = getComputedStyle(document.documentElement);
+function color(n){ return n.branch && BRANCH[n.branch] ? css.getPropertyValue(BRANCH[n.branch]).trim() : css.getPropertyValue('--c-root').trim(); }
+function px(n){ return { x:n.x*COLW, y:n.depth*ROWH }; }
+
+const stage=document.getElementById('stage'), wires=document.getElementById('wires');
+
+/* edges — hair-thin curves, brighter toward the concrete end */
+let paths='';
+edges.forEach(([p,c])=>{
+  const a=px(p), b=px(c), my=(a.y+b.y)/2;
+  paths += `<path d="M${a.x} ${a.y+8} C ${a.x} ${my}, ${b.x} ${my}, ${b.x} ${b.y-8}" `
+        +  `fill="none" stroke="${color(c)}" stroke-width="1" stroke-opacity="${0.14+c.depth*0.06}"/>`;
+});
+wires.innerHTML=paths;
+
+/* nodes */
+const SIZE=[58,42,31,22,15];   // font px by depth (abstract → concrete)
+let minX=1e9,maxX=-1e9,maxY=0;
+nodes.forEach(n=>{
+  const p=px(n);
+  minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y);
+  const el=document.createElement('div');
+  el.className='node tier'+Math.min(n.depth,4);
+  el.style.left=p.x+'px'; el.style.top=p.y+'px';
+  const size=SIZE[Math.min(n.depth,4)];
+  const tag = n.depth<=2 ? `<span class="tag">tier ${n.depth}</span>` : '';
+  el.innerHTML = tag + `<span class="w" style="font-size:${size}px; color:${color(n)}; `
+    + `opacity:${n.depth<=1?0.92:1}; text-shadow:0 0 ${n.depth<=1?26:10}px ${color(n)}${n.depth<=1?'55':'22'}">${n.w}</span>`;
+  stage.appendChild(el);
+});
+
+/* size the svg so curves aren't clipped */
+// svg sits at stage origin with overflow:visible, so paths (in stage coords) render 1:1
+wires.setAttribute('width', (maxX-minX)+COLW);
+wires.setAttribute('height', maxY+ROWH);
+
+/* ---------- pan + zoom ---------- */
+let tx=0, ty=0, s=1;
+function apply(){ stage.style.transform=`translate(${tx}px,${ty}px) scale(${s})`; }
+function center(){
+  const vw=innerWidth, root=px(nodes[0]);
+  s = vw<640 ? 0.62 : 0.9;
+  tx = vw/2 - root.x*s;
+  ty = 96;
+  apply();
+}
+center();
+addEventListener('resize', center);
+
+const field=document.getElementById('field');
+let dragging=false, lx=0, ly=0;
+field.addEventListener('pointerdown', e=>{ dragging=true; lx=e.clientX; ly=e.clientY; field.classList.add('drag'); field.setPointerCapture(e.pointerId); });
+field.addEventListener('pointermove', e=>{ if(!dragging) return; tx+=e.clientX-lx; ty+=e.clientY-ly; lx=e.clientX; ly=e.clientY; apply(); });
+addEventListener('pointerup', ()=>{ dragging=false; field.classList.remove('drag'); });
+
+field.addEventListener('wheel', e=>{
+  e.preventDefault();
+  if(e.ctrlKey){ // trackpad pinch / ctrl-scroll → zoom about cursor
+    zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY*0.01));
+  } else {       // otherwise it's boundless scroll through the void
+    tx-=e.deltaX; ty-=e.deltaY; apply();
+  }
+},{passive:false});
+
+function zoomAt(cx,cy,factor){
+  const ns=Math.min(2.4, Math.max(0.18, s*factor));
+  tx = cx - (cx-tx)*(ns/s);
+  ty = cy - (cy-ty)*(ns/s);
+  s = ns; apply();
+}
+document.getElementById('zin').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,1.2);
+document.getElementById('zout').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,1/1.2);
+</script>
+</body>
+</html>
