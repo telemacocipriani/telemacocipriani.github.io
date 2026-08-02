@@ -318,7 +318,7 @@ nodes.forEach(n=>{
   el.style.left=p.x+'px'; el.style.top=p.y+'px';
   const size=SIZE[Math.min(n.depth,6)];
   const col=color(n);
-  const tag = n.depth<=2 ? `<span class="tag">tier ${n.depth}</span>` : '';
+  const tag = '';
   let shadow;
   if(n.depth===0) shadow = `-3px 0 26px #ff1f6b88, 3px 0 26px #3d7bff88, 0 0 44px #ffffff66`;
   else if(n.depth<=2) shadow = `0 0 30px #ffffff55, 0 0 8px #ffffff88`;
