@@ -126,8 +126,6 @@ const S = (w) => ({ w, special:true });       // elevated standalone concept (no
 const TREE = N('Oneness',
   N('Dichotomy',
     N('Language',
-      S('Consciousness'),
-      S('Free will'),
 
       N('Nature',
         N('cosmos',
@@ -313,7 +311,7 @@ let dIdx = 0;
 const PADX = 46, INDENT = 30;                 /* tiny indent per level → the tree stays narrow */
 const SPINE_MAX = 2;                          /* only Oneness→Dichotomy→Language are the white spine */
 const ROWHS = [78,54,46,44,30,26,23];         /* row height by depth */
-let nodes=[], maxX=0, totalH=0, rootEl=null, yCur=0;
+let nodes=[], maxX=0, totalH=0, rootEl=null, langEl=null, yCur=0;
 function walk(n, parent, depth, accent){
   n.depth=depth; n.parent=parent||null;
   if(depth===SPINE_MAX+1){ n.accent = n.special ? '--c-concept' : PALETTE[dIdx++ % PALETTE.length]; }
@@ -372,6 +370,7 @@ nodes.forEach(n=>{
     + `opacity:${n.depth<=1?0.95:1}; text-shadow:${shadow}">${n.w}</span>`;
   stage.appendChild(el);
   if(n.depth===0) rootEl=el;
+  if(n.depth===2) langEl=el;   // Language node (holds its own hover rotation)
 });
 
 wires.setAttribute('width', maxX + 320);
@@ -387,6 +386,18 @@ rootEl.addEventListener('pointerenter', ()=>{
   rTimer=setInterval(()=>{ rIdx=(rIdx+1)%ROT.length; setRoot(ROT[rIdx]); }, 820);
 });
 rootEl.addEventListener('pointerleave', ()=>{ clearInterval(rTimer); rTimer=null; rIdx=0; setRoot('Oneness'); });
+
+/* ---------- Language label rotates on hover: Language → Consciousness → Free will ---------- */
+const LROT=['Language','Consciousness','Free will'];
+let lIdx=0, lTimer=null;
+const langW = langEl.querySelector('.w');
+langEl.style.cursor='pointer';
+function setLang(t){ langW.style.opacity=0; setTimeout(()=>{ langW.textContent=t; langW.style.opacity=0.95; },120); }
+langEl.addEventListener('pointerenter', ()=>{
+  if(lTimer) return;
+  lTimer=setInterval(()=>{ lIdx=(lIdx+1)%LROT.length; setLang(LROT[lIdx]); }, 900);
+});
+langEl.addEventListener('pointerleave', ()=>{ clearInterval(lTimer); lTimer=null; lIdx=0; setLang('Language'); });
 
 /* ---------- pan + zoom ---------- */
 let tx=0, ty=0, s=1;
