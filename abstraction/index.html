@@ -71,8 +71,10 @@
     background:repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px);}
   #intro.gone{opacity:0; pointer-events:none;}
   .introInner{position:relative; max-width:600px; text-align:center; z-index:1;}
-  #intro .kick{display:block; font-size:11px; letter-spacing:.52em; text-transform:uppercase;
-    color:var(--c-1); opacity:.85; margin-bottom:26px; text-shadow:0 0 20px var(--c-1);}
+  #intro .kick{display:block; font-family:"Times New Roman",Georgia,serif; font-weight:600;
+    font-size:40px; line-height:1.1; letter-spacing:.16em; text-transform:uppercase;
+    color:#fff; opacity:.96; margin-bottom:34px;
+    text-shadow:-2px 0 22px #ff1f6b88, 2px 0 22px #3d7bff88, 0 0 40px rgba(255,255,255,.25);}
   #intro .lede{font-family:"Times New Roman",Georgia,serif; font-size:22px; line-height:1.62;
     color:var(--bone); margin:0 0 18px; opacity:.92;}
   #intro .lede em{font-style:italic; color:#fff; text-shadow:0 0 16px rgba(255,255,255,.35);}
@@ -82,7 +84,7 @@
     border:1px solid var(--dim); border-radius:3px; padding:13px 24px; font:inherit; letter-spacing:.26em;
     text-transform:uppercase; font-size:12px; transition:.22s;}
   #enter:hover{border-color:var(--bone); color:#fff; box-shadow:0 0 26px rgba(255,255,255,.16);}
-  @media (max-width:640px){ #intro .lede{font-size:18px} #intro .ask{font-size:22px} }
+  @media (max-width:640px){ #intro .kick{font-size:27px} #intro .lede{font-size:18px} #intro .ask{font-size:22px} }
 </style>
 </head>
 <body>
@@ -95,10 +97,9 @@
 
 <div id="intro">
   <div class="introInner">
-    <span class="kick">the tree of abstraction</span>
-    <p class="lede">Every word you know sits somewhere on a ladder. At the bottom, the concrete: a <em>sparrow</em>, a <em>hammer</em>, a <em>coin</em>. Climb a rung and the word grows wider — <em>bird</em>, <em>tool</em>, <em>money</em> — until the particulars fall away and only the idea remains.</p>
-    <p class="lede">Below you hang a thousand such words, the whole named world. Above you, the ladder narrows toward its source. Climb it.</p>
-    <p class="ask">What could possibly sit at the very top?</p>
+    <span class="kick">The Tree of Abstraction</span>
+    <p class="lede">In your language, every word you know is an abstraction that represents a concept. Concrete concepts, like <em>onions</em> and <em>fennel</em>, are <em>bulbs</em>. Bulbs and tubers are <em>vegetables</em>. Vegetables and fruits are <em>food</em>.</p>
+    <p class="ask">What is the most abstract concept of all?</p>
     <button id="enter">Begin the climb ↑</button>
   </div>
 </div>
