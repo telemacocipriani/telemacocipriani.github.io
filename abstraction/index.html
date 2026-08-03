@@ -35,13 +35,13 @@
     pointer-events:auto; cursor:default; line-height:1; user-select:none;
     transition:opacity .3s, filter .3s;}
   .node .w{display:inline-block; transition:opacity .18s}
-  .node.tier0 .w,.node.tier1 .w,.node.tier2 .w{
+  .node.spineword .w{
     font-family:"Times New Roman",Georgia,serif; text-transform:uppercase; letter-spacing:.05em; font-weight:600;}
-  .node.tier3 .w,.node.tier4 .w{ text-transform:lowercase; letter-spacing:.02em;}
+  .node.concrete .w{ text-transform:lowercase; letter-spacing:.02em;}
   .node:hover{filter:brightness(1.4)}
   @keyframes breathe{0%,100%{filter:brightness(.9)} 50%{filter:brightness(1.5)}}
-  .node.tier0{cursor:pointer}
-  .node.tier0 .w{animation:breathe 3.6s ease-in-out infinite;}
+  .node.root{cursor:pointer}
+  .node.root .w{animation:breathe 3.6s ease-in-out infinite;}
   .node .tag{display:block; font-family:"SF Mono",ui-monospace,monospace; text-transform:uppercase;
     font-size:9px; letter-spacing:.3em; opacity:.34; margin-bottom:6px; font-weight:400;}
   .hud{position:fixed; pointer-events:none; z-index:5; color:var(--bone);
@@ -62,6 +62,27 @@
     font:inherit; font-size:16px; cursor:pointer; border-radius:2px; opacity:.6; transition:.2s}
   #z button:hover{opacity:1; border-color:var(--bone)}
   @media (max-width:640px){ #title{display:none} .node .tag{display:none} }
+
+  /* intro overlay — read before you climb */
+  #intro{position:fixed; inset:0; z-index:20; display:flex; align-items:center; justify-content:center;
+    padding:32px; background:radial-gradient(ellipse at 50% 38%, #0c0c14 0%, #050507 68%);
+    transition:opacity .9s ease; cursor:pointer;}
+  #intro::after{content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:overlay; opacity:.5;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px);}
+  #intro.gone{opacity:0; pointer-events:none;}
+  .introInner{position:relative; max-width:600px; text-align:center; z-index:1;}
+  #intro .kick{display:block; font-size:11px; letter-spacing:.52em; text-transform:uppercase;
+    color:var(--c-1); opacity:.85; margin-bottom:26px; text-shadow:0 0 20px var(--c-1);}
+  #intro .lede{font-family:"Times New Roman",Georgia,serif; font-size:22px; line-height:1.62;
+    color:var(--bone); margin:0 0 18px; opacity:.92;}
+  #intro .lede em{font-style:italic; color:#fff; text-shadow:0 0 16px rgba(255,255,255,.35);}
+  #intro .ask{font-family:"Times New Roman",Georgia,serif; font-size:26px; color:#fff; margin:26px 0 4px;
+    text-shadow:-2px 0 18px #ff1f6b66, 2px 0 18px #3d7bff66;}
+  #enter{margin-top:30px; cursor:pointer; background:transparent; color:var(--bone);
+    border:1px solid var(--dim); border-radius:3px; padding:13px 24px; font:inherit; letter-spacing:.26em;
+    text-transform:uppercase; font-size:12px; transition:.22s;}
+  #enter:hover{border-color:var(--bone); color:#fff; box-shadow:0 0 26px rgba(255,255,255,.16);}
+  @media (max-width:640px){ #intro .lede{font-size:18px} #intro .ask{font-size:22px} }
 </style>
 </head>
 <body>
@@ -71,6 +92,16 @@
   </div>
 </div>
 <div id="scan"></div>
+
+<div id="intro">
+  <div class="introInner">
+    <span class="kick">the tree of abstraction</span>
+    <p class="lede">Every word you know sits somewhere on a ladder. At the bottom, the concrete: a <em>sparrow</em>, a <em>hammer</em>, a <em>coin</em>. Climb a rung and the word grows wider — <em>bird</em>, <em>tool</em>, <em>money</em> — until the particulars fall away and only the idea remains.</p>
+    <p class="lede">Below you hang a thousand such words, the whole named world. Above you, the ladder narrows toward its source. Climb it.</p>
+    <p class="ask">What could possibly sit at the very top?</p>
+    <button id="enter">Begin the climb ↑</button>
+  </div>
+</div>
 
 <div class="hud" id="title"><b>ONENESS</b><span class="sub">from unity, everything —<br>dichotomy · language · world</span></div>
 <div class="hud" id="axisTop">▲ the one</div>
@@ -90,6 +121,8 @@ const N = (w, ...c) => ({ w, c });
 const TREE = N('Oneness',
   N('Dichotomy',
     N('Language',
+     N('Consciousness',
+      N('Free will',
 
       N('Nature',
         N('cosmos',
@@ -262,6 +295,7 @@ const TREE = N('Oneness',
         N('color', ...L('red','orange','yellow','green','blue','indigo','violet','black','white','gray')),
         N('value', ...L('good','evil','beauty','truth','justice','freedom','order','chaos','meaning','peace','hope')) )
 
+      ) )
     )
   )
 );
@@ -273,14 +307,15 @@ let dIdx = 0;
 /* ---------- layout ---------- */
 /* ---------- vertical outline layout: depth = a small left-indent, every word its own row ---------- */
 const PADX = 46, INDENT = 30;                 /* tiny indent per level → the tree stays narrow */
-const ROWHS = [78,54,46,34,28,25,23];         /* row height by depth (the spine breathes taller) */
+const SPINE_MAX = 4;                          /* Oneness→Dichotomy→Language→Consciousness→Free will are the spine */
+const ROWHS = [78,58,50,46,42,34,28,25,23];   /* row height by depth (the spine breathes taller) */
 let nodes=[], maxX=0, totalH=0, rootEl=null, yCur=0;
 function walk(n, parent, depth, accent){
   n.depth=depth; n.parent=parent||null;
-  if(depth===3){ n.accent = PALETTE[dIdx++ % PALETTE.length]; }
-  else if(depth>3){ n.accent = accent; }
+  if(depth===SPINE_MAX+1){ n.accent = PALETTE[dIdx++ % PALETTE.length]; }
+  else if(depth>SPINE_MAX+1){ n.accent = accent; }
   else { n.accent = null; }
-  const h = ROWHS[Math.min(depth,6)];
+  const h = ROWHS[Math.min(depth,8)];
   n.x = PADX + depth*INDENT;
   n.y = yCur + h/2;                            /* vertical centre of this row */
   yCur += h;
@@ -302,7 +337,7 @@ nodes.forEach(n=>{
   if(!n.kids) return;
   const kids=n.kids, last=kids[kids.length-1];
   const gx = n.x + INDENT*0.5;                 /* vertical guide between parent and child indent */
-  const spine = kids[0].depth<=2;
+  const spine = kids[0].depth<=SPINE_MAX;
   if(spine){
     paths += `<path class="spine" d="M${gx} ${n.y+11} L ${gx} ${last.y}"/>`;
     kids.forEach(c=>{ paths += `<path class="spine" d="M${gx} ${c.y} L ${c.x-7} ${c.y}"/>`; });
@@ -314,16 +349,17 @@ nodes.forEach(n=>{
 wires.innerHTML=paths;
 
 /* nodes */
-const SIZE=[44,31,26,18,16,14,12.5];
+const SIZE=[44,33,28,24,21,18,16,14,12.5];
 nodes.forEach(n=>{
+  const isSpine = n.depth<=SPINE_MAX;
   const el=document.createElement('div');
-  el.className='node tier'+Math.min(n.depth,4);
+  el.className='node ' + (isSpine?'spineword':'concrete') + (n.depth===0?' root':'');
   el.style.left=n.x+'px'; el.style.top=n.y+'px';
-  const size=SIZE[Math.min(n.depth,6)];
+  const size=SIZE[Math.min(n.depth,8)];
   const col=color(n);
   let shadow;
   if(n.depth===0) shadow = `-2px 0 20px #ff1f6b88, 2px 0 20px #3d7bff88, 0 0 34px #ffffff66`;
-  else if(n.depth<=2) shadow = `0 0 22px #ffffff55, 0 0 7px #ffffff88`;
+  else if(isSpine) shadow = `0 0 22px #ffffff55, 0 0 7px #ffffff88`;
   else shadow = `0 0 9px ${col}22`;
   el.innerHTML = `<span class="w" style="font-size:${size}px; color:${col}; `
     + `opacity:${n.depth<=1?0.95:1}; text-shadow:${shadow}">${n.w}</span>`;
@@ -347,7 +383,14 @@ rootEl.addEventListener('pointerleave', ()=>{ clearInterval(rTimer); rTimer=null
 
 /* ---------- pan + zoom ---------- */
 let tx=0, ty=0, s=1;
-function apply(){ stage.style.transform=`translate(${tx}px,${ty}px) scale(${s})`; }
+const TOP_STOP = 26;                          // Oneness rests here at the top — no scrolling past it
+function apply(){
+  const topLimit = TOP_STOP;
+  const botLimit = Math.min(topLimit, innerHeight - 90 - totalH*s);
+  if(ty > topLimit){ ty = topLimit; }   // arrived at the One → stop
+  if(ty < botLimit){ ty = botLimit; }   // reached the world's floor
+  stage.style.transform=`translate(${tx}px,${ty}px) scale(${s})`;
+}
 function center(){
   const vw=innerWidth, vh=innerHeight;
   s = vw<640 ? 0.92 : 1.0;
@@ -410,6 +453,13 @@ function zoomAt(cx,cy,factor){
 }
 document.getElementById('zin').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,1.25);
 document.getElementById('zout').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,1/1.25);
+
+/* ---------- intro: dismiss to reveal the tree ---------- */
+const intro=document.getElementById('intro');
+let introGone=false;
+function enterTree(){ if(introGone) return; introGone=true; intro.classList.add('gone'); setTimeout(()=>intro.remove(), 950); }
+intro.addEventListener('click', enterTree);
+addEventListener('wheel', e=>{ if(!introGone) enterTree(); }, {passive:true, once:false});
 </script>
 </body>
 </html>
