@@ -12,6 +12,7 @@
     --c-root:#ffffff;
     --c-1:#ff1f6b; --c-2:#25ffb0; --c-3:#ffd200; --c-4:#3d7bff; --c-5:#ff6a1a;
     --c-6:#16e0ff; --c-7:#b061ff; --c-8:#ff4d6d; --c-9:#7cff3d; --c-10:#ff9e00;
+    --c-concept:#c9b6ff;
   }
   *{box-sizing:border-box; margin:0; padding:0}
   html,body{height:100%; overflow:hidden; background:var(--void); color:var(--bone);
@@ -38,6 +39,7 @@
   .node.spineword .w{
     font-family:"Times New Roman",Georgia,serif; text-transform:uppercase; letter-spacing:.05em; font-weight:600;}
   .node.concrete .w{ text-transform:lowercase; letter-spacing:.02em;}
+  .node.concept .w{ font-family:"Times New Roman",Georgia,serif; text-transform:uppercase; letter-spacing:.06em; font-weight:600;}
   .node:hover{filter:brightness(1.4)}
   @keyframes breathe{0%,100%{filter:brightness(.9)} 50%{filter:brightness(1.5)}}
   .node.root{cursor:pointer}
@@ -48,10 +50,12 @@
     font-size:10px; letter-spacing:.36em; text-transform:uppercase; opacity:.5;}
   #axisTop{top:16px; left:50%; transform:translateX(-50%);}
   #axisBot{bottom:16px; left:50%; transform:translateX(-50%);}
-  #title{top:16px; left:18px; max-width:260px; letter-spacing:.3em; opacity:.66; line-height:1.95;}
-  #title b{display:block; font-size:16px; letter-spacing:.42em; color:#fff; opacity:1}
-  #title .sub{opacity:.5; font-size:9px}
-  #hint{top:100px; left:18px; opacity:.42; max-width:250px; line-height:1.7}
+  #title{top:16px; left:18px; max-width:310px; letter-spacing:normal; opacity:1; line-height:1.5; text-transform:none;}
+  #title b{display:block; font-family:"Times New Roman",Georgia,serif; font-size:12px; letter-spacing:.3em;
+    text-transform:uppercase; color:#fff; opacity:.85; margin-bottom:13px;}
+  #title .creed{display:block; font-family:"Times New Roman",Georgia,serif; font-size:13px; line-height:1.62;
+    letter-spacing:.005em; text-transform:none; color:var(--bone); opacity:.5;}
+  #title .creed em{font-style:italic; color:#fff; opacity:.85;}
   /* link back to the site lives at the BOTTOM now */
   #back{bottom:18px; left:18px; pointer-events:auto; text-decoration:none; color:var(--bone);
     opacity:.55; font-size:10px; letter-spacing:.28em; text-transform:uppercase; border:1px solid var(--dim);
@@ -104,10 +108,9 @@
   </div>
 </div>
 
-<div class="hud" id="title"><b>ONENESS</b><span class="sub">from unity, everything —<br>dichotomy · language · world</span></div>
+<div class="hud" id="title"><b>The Tree of Abstraction</b><span class="creed">In your language, every word you know is an abstraction that represents a concept. Concrete concepts, like onions and fennel, are bulbs. Bulbs and tubers are vegetables. Vegetables and fruits are food. <em>What is the most abstract concept of all?</em></span></div>
 <div class="hud" id="axisTop">▲ the one</div>
 <div class="hud" id="axisBot">the world ▼</div>
-<div class="hud" id="hint">you begin in the world below · drag up to climb toward the One · scroll · pinch to zoom</div>
 <a id="back" href="../">← telemaco</a>
 <div id="z"><button id="zout" aria-label="zoom out">−</button><button id="zin" aria-label="zoom in">+</button></div>
 
@@ -115,6 +118,7 @@
 /* ---------- helpers ---------- */
 const L = (...w) => w.map(x => ({ w:x }));
 const N = (w, ...c) => ({ w, c });
+const S = (w) => ({ w, special:true });       // elevated standalone concept (not spine, not a domain)
 
 /* ---------- the tree ----------
    Spine (Oneness → Dichotomy → Language) named by Andrea.
@@ -122,8 +126,8 @@ const N = (w, ...c) => ({ w, c });
 const TREE = N('Oneness',
   N('Dichotomy',
     N('Language',
-     N('Consciousness',
-      N('Free will',
+      S('Consciousness'),
+      S('Free will'),
 
       N('Nature',
         N('cosmos',
@@ -296,7 +300,6 @@ const TREE = N('Oneness',
         N('color', ...L('red','orange','yellow','green','blue','indigo','violet','black','white','gray')),
         N('value', ...L('good','evil','beauty','truth','justice','freedom','order','chaos','meaning','peace','hope')) )
 
-      ) )
     )
   )
 );
@@ -308,15 +311,15 @@ let dIdx = 0;
 /* ---------- layout ---------- */
 /* ---------- vertical outline layout: depth = a small left-indent, every word its own row ---------- */
 const PADX = 46, INDENT = 30;                 /* tiny indent per level → the tree stays narrow */
-const SPINE_MAX = 4;                          /* Oneness→Dichotomy→Language→Consciousness→Free will are the spine */
-const ROWHS = [78,58,50,46,42,34,28,25,23];   /* row height by depth (the spine breathes taller) */
+const SPINE_MAX = 2;                          /* only Oneness→Dichotomy→Language are the white spine */
+const ROWHS = [78,54,46,44,30,26,23];         /* row height by depth */
 let nodes=[], maxX=0, totalH=0, rootEl=null, yCur=0;
 function walk(n, parent, depth, accent){
   n.depth=depth; n.parent=parent||null;
-  if(depth===SPINE_MAX+1){ n.accent = PALETTE[dIdx++ % PALETTE.length]; }
+  if(depth===SPINE_MAX+1){ n.accent = n.special ? '--c-concept' : PALETTE[dIdx++ % PALETTE.length]; }
   else if(depth>SPINE_MAX+1){ n.accent = accent; }
   else { n.accent = null; }
-  const h = ROWHS[Math.min(depth,8)];
+  const h = ROWHS[Math.min(depth,6)];
   n.x = PADX + depth*INDENT;
   n.y = yCur + h/2;                            /* vertical centre of this row */
   yCur += h;
@@ -350,17 +353,20 @@ nodes.forEach(n=>{
 wires.innerHTML=paths;
 
 /* nodes */
-const SIZE=[44,33,28,24,21,18,16,14,12.5];
+const SIZE=[44,31,26,18,16,14,12.5];
 nodes.forEach(n=>{
   const isSpine = n.depth<=SPINE_MAX;
   const el=document.createElement('div');
-  el.className='node ' + (isSpine?'spineword':'concrete') + (n.depth===0?' root':'');
+  const cls = isSpine ? 'spineword' : (n.special ? 'concept' : 'concrete');
+  el.className='node ' + cls + (n.depth===0?' root':'');
   el.style.left=n.x+'px'; el.style.top=n.y+'px';
-  const size=SIZE[Math.min(n.depth,8)];
+  let size = SIZE[Math.min(n.depth,6)];
+  if(n.special) size = 24;
   const col=color(n);
   let shadow;
   if(n.depth===0) shadow = `-2px 0 20px #ff1f6b88, 2px 0 20px #3d7bff88, 0 0 34px #ffffff66`;
   else if(isSpine) shadow = `0 0 22px #ffffff55, 0 0 7px #ffffff88`;
+  else if(n.special) shadow = `0 0 20px ${col}66, 0 0 6px ${col}`;
   else shadow = `0 0 9px ${col}22`;
   el.innerHTML = `<span class="w" style="font-size:${size}px; color:${col}; `
     + `opacity:${n.depth<=1?0.95:1}; text-shadow:${shadow}">${n.w}</span>`;
